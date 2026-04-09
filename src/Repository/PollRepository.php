@@ -59,8 +59,58 @@ class PollRepository
             $category
         );
     }
+
+    public function findByCategoryId(int $id): array
+    {
+        $stmt = Mysql::getInstance()->getPdo()->prepare('SELECT * FROM poll WHERE category_id = ?');
+        $stmt->execute([$id]);
+        $polls = [];
+        $catRepo = new CategoryRepository();
+        $category = $catRepo->findById($id);
+        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $poll = new Poll(
+                $data['id'],
+                $data['title'],
+                $data['description'],
+                $data['user_id'],
+                $data['category_id'],
+                $category
+            );
+            $polls[] = $poll;
+        }
+        return $polls;
+    }
     
-    // TODO : Ajouter une méthode create(Poll $poll) pour insérer un nouveau sondage en base de données
+    public function create(Poll $poll, array $options): Poll
+    {
+        $stmt = Mysql::getInstance()->getPdo()->prepare('INSERT INTO poll (title, description, user_id, category_id) VALUES (?, ?, ?, ?)');
+        $stmt->execute([
+            $poll->getTitle(),
+            $poll->getDescription(),
+            $poll->getUserId(),
+            $poll->getCategoryId()
+        ]);
+
+        $pollId = Mysql::getInstance()->getPdo()->lastInsertId();
+
+        foreach ($options as $option) {
+            $option = trim($option);
+            if ($option === '') continue;
+            $stmt = Mysql::getInstance()->getPdo()->prepare('INSERT INTO poll_item (name, poll_id) VALUES (?, ?)');
+            $stmt->execute([
+                $option,
+                $pollId
+            ]);
+        }
+        return new Poll(
+            $pollId,
+            $poll->getTitle(),
+            $poll->getDescription(),
+            $poll->getUserId(),
+            $poll->getCategoryId(),
+            $poll->getCategory()
+        );
+    }
 
 
 }

@@ -49,5 +49,45 @@
     </div>
   </div>
 </div>
+
+<div class="row mt-5">
+  <div class="col-lg-8">
+    <h2 class="mb-3">Commentaires</h2>
+
+    <?php if (!empty($comments)) { ?>
+      <div class="list-group mb-4">
+        <?php foreach ($comments as $comment) { ?>
+          <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <strong><?= htmlspecialchars($comment->getUser()?->getNickname() ?? 'Utilisateur') ?></strong>
+              <small class="text-body-secondary"><?= htmlspecialchars(date('d/m/Y à H:i', strtotime($comment->getCreatedAt()))) ?></small>
+            </div>
+            <p class="mb-0"><?= nl2br(htmlspecialchars($comment->getContent())) ?></p>
+          </div>
+        <?php } ?>
+      </div>
+    <?php } else { ?>
+      <div class="alert alert-light border mb-4">Aucun commentaire pour le moment.</div>
+    <?php } ?>
+
+    <?php if (!empty($_SESSION['user'])) { ?>
+      <form method="post" action="/poll/comment/?id=<?= $poll->getId() ?>" class="card card-body">
+        <h3 class="h5">Ajouter un commentaire</h3>
+        <?php if (!empty($commentError)) { ?>
+          <div class="alert alert-danger mt-2"><?= htmlspecialchars($commentError) ?></div>
+        <?php } ?>
+        <div class="mb-3">
+          <label for="commentContent" class="form-label">Votre message</label>
+          <textarea id="commentContent" name="content" class="form-control" rows="4" required></textarea>
+        </div>
+        <div>
+          <input type="submit" class="btn btn-primary" value="Publier">
+        </div>
+      </form>
+    <?php } else { ?>
+      <div class="alert alert-warning">Connectez-vous pour laisser un commentaire.</div>
+    <?php } ?>
+  </div>
+</div>
 <a href="/" class="btn btn-secondary mt-4">Retour à la liste</a>
 <?php require __DIR__ . '/../footer.php'; ?>

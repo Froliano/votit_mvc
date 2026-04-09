@@ -1,9 +1,9 @@
 <?php require __DIR__ . '/../header.php'; ?>
 <div class="row text-center">
-    <h2>Liste des sondages</h2>
+    <h2>Liste des catégories</h2>
     <div class="row">
-        <?php foreach ($polls as $poll) {
-            include __DIR__ . '/../poll/poll_part.php';
+        <?php foreach ($categories as $category) {
+            include __DIR__ . '/../category/category_part.php';
         } ?>
     </div>
 </div>
